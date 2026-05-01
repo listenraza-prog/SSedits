@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PhotoText Studio – Edit Text in Images Online Free</title>
+  <meta name="description" content="The easiest way to add, edit, and style text on images online. No sign-up. No Photoshop skills needed. Free forever." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Fabric.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+
+  <style>
+    /* ============================================================
+       RESET & ROOT VARIABLES
+    ============================================================ */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --primary:       #6366f1;
+      --primary-dark:  #4f46e5;
+      --primary-light: #e0e7ff;
+      --success:       #10b981;
+      --danger:        #ef4444;
+      --warning:       #f59e0b;
+      --bg-app:        #0f0f23;
+      --bg-panel:      #1a1a35;
+      --bg-card:       #252545;
+      --bg-hover:      #2e2e55;
+      --border:        rgba(255,255,255,0.08);
+      --text-primary:  #f1f5f9;
+      --text-muted:    #94a3b8;
+      --text-dim:      #64748b;
+      --shadow-lg:     0 20px 60px rgba(0,0,0,0.5);
+      --radius-sm:     6px;
+      --radius-md:     10px;
+      --radius-lg:     16px;
+      --radius-xl:     24px;
+      --transition:    all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-app);
+      color: var(--text-primary);
+      overflow-x: hidden;
+    }
+
+    /* ============================================================
+       SCROLLBAR
+    ============================================================ */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-panel); }
+    ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 99px; }
+
+    /* ============================================================
+       HEADER
+    ============================================================ */
+    .app-header {
+      height: 58px;
+      background: var(--bg-panel);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 999;
+      backdrop-filter: blur(12px);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 1.25rem;
+      letter-spacing: -0.5px;
+      color: var(--text-primary);
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      width: 34px; height: 34px;
+      background: linear-gradient(135deg, var(--primary), #8b5cf6);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+
+    .logo span { color: var(--primary); }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 18px;
+      border-radius: var(--radius-md);
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: var(--transition);
+      font-family: 'Inter', sans-serif;
+      line-height: 1;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), #8b5cf6);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(99,102,241,0.4);
+    }
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(99,102,241,0.5);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, var(--success), #059669);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(16,185,129,0.4);
+    }
+    .btn-success:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(16,185,129,0.5);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: #fff;
+    }
+    .btn-danger:hover { background: #dc2626; }
+
+    .btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    .btn-icon {
+      width: 34px; height: 34px;
+      padding: 0;
+      justify-content: center;
+      border-radius: var(--radius-sm);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 15px;
+    }
+    .btn-icon:hover { background: var(--bg-hover); color: var(--text-primary); }
+    .btn-icon.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+    /* ============================================================
+       MAIN LAYOUT
+    ============================================================ */
+    .app-body {
+      display: flex;
+      height: 100vh;
+      padding-top: 58px;
+    }
+
+    /* ============================================================
+       LEFT SIDEBAR – TOOLS
+    ============================================================ */
+    .sidebar-left {
+      width: 240px;
+      min-width: 240px;
+      background: var(--bg-panel);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 16px 12px;
+      gap: 6px;
+    }
+
+    .sidebar-section-title {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--text-dim);
+      padding: 10px 8px 6px;
+    }
+
+    .tool-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: 'Inter', sans-serif;
+      font-size: 13.5px;
+      font-weight: 500;
+      transition: var(--transition);
+      width: 100%;
+      text-align: left;
+    }
+
+    .tool-btn:hover {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border-color: var(--border);
+    }
+
+    .tool-btn.active {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      border-color: rgba(99,102,241,0.3);
+    }
+
+    .tool-icon {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      background: var(--bg-card);
+      flex-shrink: 0;
+    }
+
+    .tool-btn.active .tool-icon {
+      background: var(--primary);
+    }
+
+    /* Upload Drop Zone */
+    .upload-zone {
+      border: 2px dashed rgba(99,102,241,0.4);
+      border-radius: var(--radius-lg);
+      padding: 30px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+      background: rgba(99,102,241,0.03);
+      margin: 8px 0;
+    }
+
+    .upload-zone:hover, .upload-zone.dragover {
+      border-color: var(--primary);
+      background: rgba(99,102,241,0.08);
+    }
+
+    .upload-zone-icon {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+
+    .upload-zone p {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .upload-zone strong {
+      color: var(--primary);
+      display: block;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    /* ============================================================
+       CANVAS AREA
+    ============================================================ */
+    .canvas-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-app);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .canvas-toolbar {
+      height: 48px;
+      background: var(--bg-panel);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 16px;
+      flex-shrink: 0;
+      overflow-x: auto;
+    }
+
+    .toolbar-divider {
+      width: 1px;
+      height: 24px;
+      background: var(--border);
+      margin: 0 4px;
+      flex-shrink: 0;
+    }
+
+    .canvas-viewport {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: auto;
+      padding: 40px;
+      position: relative;
+    }
+
+    .canvas-wrapper {
+      position: relative;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+      border-radius: 4px;
+    }
+
+    #editor-canvas {
+      display: block;
+      border-radius: 4px;
+    }
+
+    /* Canvas checkered background (for transparency) */
+    .canvas-checker {
+      position: absolute;
+      inset: 0;
+      border-radius: 4px;
+      background-image:
+        linear-gradient(45deg, #333 25%, transparent 25%),
+        linear-gradient(-45deg, #333 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #333 75%),
+        linear-gradient(-45deg, transparent 75%, #333 75%);
+      background-size: 16px 16px;
+      background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+      z-index: -1;
+      opacity: 0.2;
+    }
+
+    /* ============================================================
+       DROP OVERLAY
+    ============================================================ */
+    .drop-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(99,102,241,0.15);
+      backdrop-filter: blur(4px);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 500;
+      border: 3px dashed var(--primary);
+    }
+
+    .drop-overlay.active { display: flex; }
+
+    .drop-overlay-icon { font-size: 64px; margin-bottom: 16px; }
+    .drop-overlay-text {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    /* ============================================================
+       WELCOME SCREEN
+    ============================================================ */
+    #welcome-screen {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      z-index: 100;
+    }
+
+    .welcome-icon { font-size: 64px; }
+
+    .welcome-title {
+      font-size: 2rem;
+      font-weight: 800;
+      text-align: center;
+      background: linear-gradient(135deg, #fff, var(--primary), #8b5cf6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .welcome-sub {
+      font-size: 15px;
+      color: var(--text-muted);
+      text-align: center;
+      max-width: 400px;
+      line-height: 1.7;
+    }
+
+    .welcome-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .welcome-upload-btn {
+      font-size: 15px;
+      padding: 14px 32px;
+      border-radius: var(--radius-lg);
+    }
+
+    /* ============================================================
+       RIGHT SIDEBAR – PROPERTIES
+    ============================================================ */
+    .sidebar-right {
+      width: 260px;
+      min-width: 260px;
+      background: var(--bg-panel);
+      border-left: 1px solid var(--border);
+      overflow-y: auto;
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .panel {
+      background: var(--bg-card);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      margin-bottom: 8px;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .panel-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+    }
+
+    .panel-toggle {
+      color: var(--text-dim);
+      font-size: 12px;
+      transition: var(--transition);
+    }
+
+    .panel-body {
+      padding: 12px 14px 14px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .form-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .form-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 500;
+      flex-shrink: 0;
+    }
+
+    .form-control {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      padding: 6px 10px;
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      transition: var(--transition);
+      width: 100%;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(99,102,241,0.2);
+    }
+
+    .form-control-sm {
+      padding: 5px 8px;
+      font-size: 12px;
+      width: 70px;
+    }
+
+    input[type="range"].form-control {
+      padding: 0;
+      height: 4px;
+      cursor: pointer;
+      -webkit-appearance: none;
+      appearance: none;
+      border-radius: 99px;
+      background: linear-gradient(to right, var(--primary) 0%, var(--bg-hover) 0%);
+    }
+
+    input[type="range"].form-control::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+      box-shadow: 0 0 0 3px rgba(99,102,241,0.3);
+    }
+
+    input[type="color"].color-input {
+      width: 32px; height: 32px;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      background: none;
+      padding: 2px;
+    }
+
+    input[type="color"].color-input::-webkit-color-swatch-wrapper { padding: 0; }
+    input[type="color"].color-input::-webkit-color-swatch { border: none; border-radius: 3px; }
+
+    .font-style-row {
+      display: flex;
+      gap: 6px;
+    }
+
+    .align-row {
+      display: flex;
+      gap: 4px;
+    }
+
+    .align-row .btn-icon {
+      flex: 1;
+    }
+
+    /* ============================================================
+       FONT LIST
+    ============================================================ */
+    .font-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .font-chip {
+      padding: 8px 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--bg-panel);
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--text-muted);
+      text-align: center;
+      transition: var(--transition);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .font-chip:hover, .font-chip.active {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: rgba(99,102,241,0.08);
+    }
+
+    /* ============================================================
+       EFFECTS / PRESETS
+    ============================================================ */
+    .effects-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .effect-btn {
+      aspect-ratio: 1;
+      border-radius: var(--radius-md);
+      border: 2px solid var(--border);
+      background: var(--bg-panel);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      font-size: 10px;
+      color: var(--text-muted);
+      transition: var(--transition);
+      padding: 8px;
+    }
+
+    .effect-btn:hover, .effect-btn.active {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: rgba(99,102,241,0.08);
+    }
+
+    .effect-preview { font-size: 20px; }
+
+    /* ============================================================
+       LAYERS PANEL
+    ============================================================ */
+    .layers-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .layer-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--bg-panel);
+      cursor: pointer;
+      transition: var(--transition);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .layer-item:hover { background: var(--bg-hover); color: var(--text-primary); }
+    .layer-item.active { border-color: var(--primary); color: var(--primary); }
+
+    .layer-icon { font-size: 14px; }
+
+    /* ============================================================
+       TOAST NOTIFICATIONS
+    ============================================================ */
+    .toast-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .toast {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 20px;
+      border-radius: var(--radius-md);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-lg);
+      font-size: 13.5px;
+      font-weight: 500;
+      animation: slideInRight 0.3s ease;
+      min-width: 250px;
+    }
+
+    .toast.success { border-left: 3px solid var(--success); }
+    .toast.error { border-left: 3px solid var(--danger); }
+    .toast.info { border-left: 3px solid var(--primary); }
+
+    @keyframes slideInRight {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* ============================================================
+       STATUS BAR
+    ============================================================ */
+    .status-bar {
+      height: 26px;
+      background: var(--bg-panel);
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 20px;
+      font-size: 11px;
+      color: var(--text-dim);
+      flex-shrink: 0;
+    }
+
+    .status-item { display: flex; align-items: center; gap: 5px; }
+    .status-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--success);
+    }
+
+    /* ============================================================
+       HIDDEN FILE INPUT
+    ============================================================ */
+    #file-input { display: none; }
+
+    /* ============================================================
+       RESPONSIVE
+    ============================================================ */
+    @media (max-width: 900px) {
+      .sidebar-left { width: 56px; min-width: 56px; }
+      .sidebar-left .upload-zone,
+      .sidebar-left .sidebar-section-title { display: none; }
+      .tool-btn span { display: none; }
+      .tool-btn { justify-content: center; padding: 10px; }
+      .tool-icon { margin: 0; }
+      .sidebar-right { width: 220px; min-width: 220px; }
+    }
+
+    @media (max-width: 600px) {
+      .sidebar-right { display: none; }
+      .header-actions .btn span { display: none; }
+    }
+
+    /* ============================================================
+       LOADING SPINNER
+    ============================================================ */
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ============================================================
+       ZOOM CONTROLS
+    ============================================================ */
+    .zoom-controls {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      display: flex;
+      gap: 6px;
+      z-index: 10;
+    }
+
+    .zoom-badge {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 6px 12px;
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ================================================================
+     HEADER
+================================================================ -->
+<header class="app-header">
+  <a class="logo" href="#">
+    <div class="logo-icon">✍️</div>
+    Photo<span>Text</span> Studio
+  </a>
+
+  <div class="header-actions">
+    <button class="btn btn-ghost" id="undo-btn" disabled title="Undo (Ctrl+Z)">↩ Undo</button>
+    <button class="btn btn-ghost" id="redo-btn" disabled title="Redo (Ctrl+Y)">↪ Redo</button>
+    <div class="toolbar-divider"></div>
+    <button class="btn btn-primary" id="header-upload-btn">📁 <span>Open Image</span></button>
+    <button class="btn btn-success" id="download-btn" disabled>💾 <span>Download</span></button>
+  </div>
+</header>
+
+<!-- ================================================================
+     APP BODY
+================================================================ -->
+<div class="app-body">
+
+  <!-- LEFT SIDEBAR -->
+  <aside class="sidebar-left">
+
+    <div class="sidebar-section-title">Upload</div>
+
+    <!-- Drop Zone -->
+    <div class="upload-zone" id="upload-zone">
+      <div class="upload-zone-icon">🖼️</div>
+      <strong>Click or Drop Image</strong>
+      <p>JPG, PNG, WEBP, GIF<br/>Up to 20MB</p>
+    </div>
+
+    <div class="sidebar-section-title">Tools</div>
+
+    <button class="tool-btn active" id="tool-select">
+      <div class="tool-icon">🖱️</div>
+      <span>Select / Move</span>
+    </button>
+
+    <button class="tool-btn" id="tool-text">
+      <div class="tool-icon">T</div>
+      <span>Add Text</span>
+    </button>
+
+    <button class="tool-btn" id="tool-shape">
+      <div class="tool-icon">◻</div>
+      <span>Add Shape</span>
+    </button>
+
+    <button class="tool-btn" id="tool-sticker">
+      <div class="tool-icon">⭐</div>
+      <span>Stickers</span>
+    </button>
+
+    <div class="sidebar-section-title">Actions</div>
+
+    <button class="tool-btn" id="tool-flip-h">
+      <div class="tool-icon">⇔</div>
+      <span>Flip Horizontal</span>
+    </button>
+
+    <button class="tool-btn" id="tool-flip-v">
+      <div class="tool-icon">⇕</div>
+      <span>Flip Vertical</span>
+    </button>
+
+    <button class="tool-btn" id="tool-bring-front">
+      <div class="tool-icon">⬆</div>
+      <span>Bring Forward</span>
+    </button>
+
+    <button class="tool-btn" id="tool-send-back">
+      <div class="tool-icon">⬇</div>
+      <span>Send Backward</span>
+    </button>
+
+    <button class="tool-btn" id="tool-duplicate">
+      <div class="tool-icon">⧉</div>
+      <span>Duplicate</span>
+    </button>
+
+    <button class="tool-btn" id="tool-delete" style="color: var(--danger);">
+      <div class="tool-icon">🗑</div>
+      <span>Delete Selected</span>
+    </button>
+
+    <button class="tool-btn" id="tool-clear">
+      <div class="tool-icon">✕</div>
+      <span>Clear All</span>
+    </button>
+
+  </aside>
+
+  <!-- CANVAS AREA -->
+  <main class="canvas-area">
+
+    <!-- Canvas Toolbar -->
+    <div class="canvas-toolbar">
+      <button class="btn-icon btn" id="tb-bold" title="Bold">𝐁</button>
+      <button class="btn-icon btn" id="tb-italic" title="Italic">𝐼</button>
+      <button class="btn-icon btn" id="tb-underline" title="Underline">U̲</button>
+      <div class="toolbar-divider"></div>
+      <button class="btn-icon btn" id="tb-align-left" title="Align Left">⬅</button>
+      <button class="btn-icon btn" id="tb-align-center" title="Center" style="background: var(--bg-hover);">☰</button>
+      <button class="btn-icon btn" id="tb-align-right" title="Align Right">➡</button>
+      <div class="toolbar-divider"></div>
+      <button class="btn-icon btn" id="tb-shadow" title="Toggle Shadow">💡</button>
+      <button class="btn-icon btn" id="tb-outline" title="Toggle Outline">◎</button>
+      <div class="toolbar-divider"></div>
+      <button class="btn-icon btn" id="tb-zoom-in" title="Zoom In">🔍+</button>
+      <button class="btn-icon btn" id="tb-zoom-out" title="Zoom Out">🔍−</button>
+      <button class="btn-icon btn" id="tb-zoom-fit" title="Fit to Screen">⊡</button>
+      <span class="zoom-badge" id="zoom-label">100%</span>
+      <div class="toolbar-divider"></div>
+      <span style="font-size:12px; color: var(--text-dim);" id="canvas-size-label">800 × 600</span>
+    </div>
+
+    <!-- Canvas Viewport -->
+    <div class="canvas-viewport" id="canvas-viewport">
+      <div class="drop-overlay" id="drop-overlay">
+        <div class="drop-overlay-icon">📸</div>
+        <div class="drop-overlay-text">Drop your image here!</div>
+      </div>
+
+      <!-- Welcome Screen -->
+      <div id="welcome-screen">
+        <div class="welcome-icon">🎨</div>
+        <h1 class="welcome-title">PhotoText Studio</h1>
+        <p class="welcome-sub">Upload any image and add beautiful, customizable text overlays. No Photoshop skills needed — free forever.</p>
+        <div class="welcome-actions">
+          <button class="btn btn-primary welcome-upload-btn" id="welcome-upload-btn">
+            📁 Open Image
+          </button>
+          <button class="btn btn-ghost welcome-upload-btn" id="try-demo-btn">
+            ✨ Try Demo
+          </button>
+        </div>
+      </div>
+
+      <!-- Fabric Canvas Wrapper -->
+      <div class="canvas-wrapper" id="canvas-wrapper" style="display:none;">
+        <div class="canvas-checker"></div>
+        <canvas id="editor-canvas"></canvas>
+      </div>
+    </div>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+      <div class="status-item">
+        <div class="status-dot"></div>
+        <span>Ready</span>
+      </div>
+      <div class="status-item" id="status-pos">Position: –</div>
+      <div class="status-item" id="status-size">Size: –</div>
+      <div class="status-item" id="status-objects">Objects: 0</div>
+      <div class="status-item" id="status-selected">Selected: none</div>
+    </div>
+  </main>
+
+  <!-- RIGHT SIDEBAR – PROPERTIES -->
+  <aside class="sidebar-right">
+
+    <!-- Text Properties -->
+    <div class="panel" id="text-panel">
+      <div class="panel-header">
+        <span class="panel-title">✍️ Text Properties</span>
+        <span class="panel-toggle">▾</span>
+      </div>
+      <div class="panel-body">
+        <!-- Font Family -->
+        <div>
+          <div class="form-label" style="margin-bottom:6px;">Font Family</div>
+          <div class="font-list" id="font-list">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+
+        <!-- Font Size -->
+        <div class="form-row">
+          <label class="form-label">Size</label>
+          <input type="range" class="form-control" id="font-size" min="8" max="200" value="48" />
+          <input type="number" class="form-control form-control-sm" id="font-size-input" value="48" min="8" max="200" />
+        </div>
+
+        <!-- Font Color -->
+        <div class="form-row">
+          <label class="form-label">Color</label>
+          <input type="color" class="color-input" id="text-color" value="#ffffff" />
+          <input type="text" class="form-control form-control-sm" id="text-color-hex" value="#ffffff" placeholder="#fff" />
+        </div>
+
+        <!-- Letter Spacing -->
+        <div class="form-row">
+          <label class="form-label">Spacing</label>
+          <input type="range" class="form-control" id="letter-spacing" min="-10" max="100" value="0" />
+          <span class="form-label" id="letter-spacing-val">0</span>
+        </div>
+
+        <!-- Line Height -->
+        <div class="form-row">
+          <label class="form-label">Line H.</label>
+          <input type="range" class="form-control" id="line-height" min="0.5" max="3" step="0.1" value="1.2" />
+          <span class="form-label" id="line-height-val">1.2</span>
+        </div>
+
+        <!-- Opacity -->
+        <div class="form-row">
+          <label class="form-label">Opacity</label>
+          <input type="range" class="form-control" id="obj-opacity" min="0" max="1" step="0.01" value="1" />
+          <span class="form-label" id="obj-opacity-val">100%</span>
+        </div>
+
+        <!-- Rotation -->
+        <div class="form-row">
+          <label class="form-label">Rotate</label>
+          <input type="range" class="form-control" id="obj-rotation" min="0" max="360" value="0" />
+          <span class="form-label" id="obj-rotation-val">0°</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Shadow Properties -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">💡 Shadow</span>
+        <span class="panel-toggle">▾</span>
+      </div>
+      <div class="panel-body">
+        <div class="form-row">
+          <label class="form-label">Color</label>
+          <input type="color" class="color-input" id="shadow-color" value="#000000" />
+        </div>
+        <div class="form-row">
+          <label class="form-label">Blur</label>
+          <input type="range" class="form-control" id="shadow-blur" min="0" max="40" value="4" />
+          <span class="form-label" id="shadow-blur-val">4</span>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Offset X</label>
+          <input type="range" class="form-control" id="shadow-x" min="-30" max="30" value="2" />
+          <span class="form-label" id="shadow-x-val">2</span>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Offset Y</label>
+          <input type="range" class="form-control" id="shadow-y" min="-30" max="30" value="2" />
+          <span class="form-label" id="shadow-y-val">2</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stroke / Outline -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">◎ Stroke / Outline</span>
+        <span class="panel-toggle">▾</span>
+      </div>
+      <div class="panel-body">
+        <div class="form-row">
+          <label class="form-label">Color</label>
+          <input type="color" class="color-input" id="stroke-color" value="#000000" />
+        </div>
+        <div class="form-row">
+          <label class="form-label">Width</label>
+          <input type="range" class="form-control" id="stroke-width" min="0" max="20" value="0" />
+          <span class="form-label" id="stroke-width-val">0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Text Effects -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">✨ Quick Effects</span>
+        <span class="panel-toggle">▾</span>
+      </div>
+      <div class="panel-body">
+        <div class="effects-grid">
+          <button class="effect-btn" data-effect="none">
+            <span class="effect-preview">Aa</span>
+            <span>Normal</span>
+          </button>
+          <button class="effect-btn" data-effect="shadow">
+            <span class="effect-preview" style="text-shadow:2px 2px 4px rgba(0,0,0,0.8);">Aa</span>
+            <span>Shadow</span>
+          </button>
+          <button class="effect-btn" data-effect="neon">
+            <span class="effect-preview" style="text-shadow:0 0 8px #6366f1, 0 0 16px #8b5cf6; color:#a5b4fc;">Aa</span>
+            <span>Neon</span>
+          </button>
+          <button class="effect-btn" data-effect="outline">
+            <span class="effect-preview" style="-webkit-text-stroke: 1px #fff; color: transparent;">Aa</span>
+            <span>Outline</span>
+          </button>
+          <button class="effect-btn" data-effect="fire">
+            <span class="effect-preview" style="background: linear-gradient(#ff0,#f00); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Aa</span>
+            <span>Fire</span>
+          </button>
+          <button class="effect-btn" data-effect="ice">
+            <span class="effect-preview" style="background: linear-gradient(#a5f3fc,#3b82f6); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Aa</span>
+            <span>Ice</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Layers -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">📑 Layers</span>
+        <span class="panel-toggle">▾</span>
+      </div>
+      <div class="panel-body">
+        <div class="layers-list" id="layers-list">
+          <div style="font-size:12px; color: var(--text-dim); text-align:center; padding:10px 0;">
+            No layers yet
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </aside>
+
+</div><!-- end app-body -->
+
+<!-- Hidden File Input -->
+<input type="file" id="file-input" accept="image/*" />
+
+<!-- Toast Container -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- ================================================================
+     JAVASCRIPT
+================================================================ -->
+<script>
+// ================================================================
+//  UTILITY: Toast Notifications
+// ================================================================
+function showToast(message, type = 'info', duration = 3000) {
+  const container = document.getElementById('toast-container');
+  const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `<span>${icons[type]}</span><span>${message}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), duration);
+}
+
+// ================================================================
+//  UTILITY: Update Range Slider Track Fill
+// ================================================================
+function updateRangeFill(input) {
+  const min = parseFloat(input.min) || 0;
+  const max = parseFloat(input.max) || 100;
+  const val = parseFloat(input.value);
+  const pct = ((val - min) / (max - min)) * 100;
+  input.style.background = `linear-gradient(to right, var(--primary) ${pct}%, var(--bg-hover) ${pct}%)`;
+}
+
+document.querySelectorAll('input[type="range"]').forEach(r => {
+  updateRangeFill(r);
+  r.addEventListener('input', () => updateRangeFill(r));
+});
+
+// ================================================================
+//  CANVAS INITIALIZATION
+// ================================================================
+const canvas = new fabric.Canvas('editor-canvas', {
+  width: 800,
+  height: 600,
+  preserveObjectStacking: true,
+  selection: true,
+  backgroundColor: '#ffffff'
+});
+
+// ================================================================
+//  HISTORY (Undo/Redo)
+// ================================================================
+let historyStack = [];
+let redoStack = [];
+let historyLock = false;
+
+function saveHistory() {
+  if (historyLock) return;
+  redoStack = [];
+  historyStack.push(JSON.stringify(canvas.toJSON()));
+  if (historyStack.length > 40) historyStack.shift();
+  updateHistoryBtns();
+}
+
+function undo() {
+  if (historyStack.length < 2) return;
+  historyLock = true;
+  redoStack.push(historyStack.pop());
+  const state = historyStack[historyStack.length - 1];
+  canvas.loadFromJSON(state, () => {
+    canvas.renderAll();
+    historyLock = false;
+    updateHistoryBtns();
+    updateLayers();
+    updateStatus();
+  });
+}
+
+function redo() {
+  if (!redoStack.length) return;
+  historyLock = true;
+  const state = redoStack.pop();
+  historyStack.push(state);
+  canvas.loadFromJSON(state, () => {
+    canvas.renderAll();
+    historyLock = false;
+    updateHistoryBtns();
+    updateLayers();
+    updateStatus();
+  });
+}
+
+function updateHistoryBtns() {
+  document.getElementById('undo-btn').disabled = historyStack.length < 2;
+  document.getElementById('redo-btn').disabled = redoStack.length === 0;
+}
+
+document.getElementById('undo-btn').addEventListener('click', undo);
+document.getElementById('redo-btn').addEventListener('click', redo);
+
+// ================================================================
+//  FONTS
+// ================================================================
+const FONTS = [
+  'Arial', 'Georgia', 'Impact', 'Courier New', 'Verdana',
+  'Times New Roman', 'Trebuchet MS', 'Comic Sans MS', 'Palatino',
+  'Tahoma', 'Helvetica', 'Book Antiqua', 'Arial Black', 'Garamond',
+  'Century Gothic', 'Franklin Gothic', 'Brush Script MT', 'Lucida',
+  'Futura', 'Rockwell'
+];
+
+let activeFont = 'Arial';
+
+const fontList = document.getElementById('font-list');
+FONTS.forEach(font => {
+  const chip = document.createElement('button');
+  chip.className = 'font-chip' + (font === 'Arial' ? ' active' : '');
+  chip.textContent = font;
+  chip.style.fontFamily = font;
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.font-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    activeFont = font;
+    applyToActive('fontFamily', font);
+  });
+  fontList.appendChild(chip);
+});
+
+// ================================================================
+//  FILE UPLOAD & DRAG-AND-DROP
+// ================================================================
+let hasImage = false;
+
+function loadImageFile(file) {
+  if (!file || !file.type.startsWith('image/')) {
+    showToast('Please upload a valid image file.', 'error');
+    return;
+  }
+  if (file.size > 20 * 1024 * 1024) {
+    showToast('File too large. Max 20MB.', 'error');
+    return;
+  }
+
+  showToast('Loading image…', 'info', 1500);
+  const reader = new FileReader();
+  reader.onload = e => {
+    fabric.Image.fromURL(e.target.result, img => {
+      const MAX_W = 900;
+      const MAX_H = 650;
+      let w = img.width;
+      let h = img.height;
+      const scale = Math.min(MAX_W / w, MAX_H / h, 1);
+      w = Math.round(w * scale);
+      h = Math.round(h * scale);
+
+      canvas.setWidth(w);
+      canvas.setHeight(h);
+      document.getElementById('canvas-size-label').textContent = `${w} × ${h}`;
+
+      canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas), {
+        scaleX: w / img.width,
+        scaleY: h / img.height,
+        originX: 'left',
+        originY: 'top'
+      });
+
+      hasImage = true;
+      document.getElementById('welcome-screen').style.display = 'none';
+      document.getElementById('canvas-wrapper').style.display = 'block';
+      document.getElementById('download-btn').disabled = false;
+      historyStack = [];
+      saveHistory();
+      showToast('Image loaded! Add text to get started.', 'success');
+      updateStatus();
+    }, { crossOrigin: 'anonymous' });
+  };
+  reader.readAsDataURL(file);
+}
+
+// File input trigger
+['file-input', 'file-input'].forEach(() => {});
+const fileInput = document.getElementById('file-input');
+
+function triggerUpload() { fileInput.click(); }
+
+document.getElementById('header-upload-btn').addEventListener('click', triggerUpload);
+document.getElementById('welcome-upload-btn').addEventListener('click', triggerUpload);
+document.getElementById('upload-zone').addEventListener('click', triggerUpload);
+fileInput.addEventListener('change', e => {
+  if (e.target.files[0]) loadImageFile(e.target.files[0]);
+  fileInput.value = '';
+});
+
+// Drag & Drop on entire window
+const dropOverlay = document.getElementById('drop-overlay');
+window.addEventListener('dragover', e => { e.preventDefault(); dropOverlay.classList.add('active'); });
+window.addEventListener('dragleave', e => { if (e.relatedTarget === null) dropOverlay.classList.remove('active'); });
+window.addEventListener('drop', e => {
+  e.preventDefault();
+  dropOverlay.classList.remove('active');
+  const file = e.dataTransfer.files[0];
+  if (file) loadImageFile(file);
+});
+
+// Upload zone drag
+const uploadZone = document.getElementById('upload-zone');
+uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+uploadZone.addEventListener('drop', e => {
+  e.preventDefault();
+  uploadZone.classList.remove('dragover');
+  loadImageFile(e.dataTransfer.files[0]);
+});
+
+// ================================================================
+//  DEMO IMAGE
+// ================================================================
+document.getElementById('try-demo-btn').addEventListener('click', () => {
+  const url = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=900&q=80';
+  showToast('Loading demo image…', 'info', 2000);
+  fabric.Image.fromURL(url, img => {
+    const MAX_W = 900, MAX_H = 650;
+    const scale = Math.min(MAX_W / img.width, MAX_H / img.height, 1);
+    const w = Math.round(img.width * scale);
+    const h
